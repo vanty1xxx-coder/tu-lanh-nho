@@ -39,7 +39,7 @@ function sourceDetails(i){
 function render(){
   const active=items.filter(i=>!i.used);
   $('#stats').replaceChildren(...[[active.length,'món trong tủ'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3).length,'sắp đến mốc / hạn'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)<0).length,'quá mốc / hạn']].map(([n,t])=>{const e=el('div',undefined,'stat');e.append(el('strong',n),el('span',t));return e}));
-  const visible=items.filter(i=>(filter==='used'?i.used:!i.used)&&(filter!=='soon'||days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3)&&(filter!=='expired'||days(i.expiry)!==null&&days(i.expiry)<0)&&(filter!=='unknown'||!i.expiry)&&norm(i.name).includes(norm($('#search').value))).sort((a,b)=>(a.expiry||'9999').localeCompare(b.expiry||'9999'));
+  const visible=items.filter(i=>(filter==='used'?i.used:!i.used)&&(filter!=='soon'||days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3)&&(filter!=='expired'||days(i.expiry)!==null&&days(i.expiry)<0)&&(filter!=='unknown'||!i.expiry)&&norm(i.name).includes(norm($('#search').value))).reverse();
   $('#list').replaceChildren();if(!visible.length)$('#list').append(el('div',filter==='all'&&!items.length?'Tủ đang trống. Thêm món đầu tiên của bạn nhé!':'Không có món nào trong danh sách này.','empty'));
   for(const i of visible){
     const a=el('article'),body=el('div',undefined,'food'),actions=el('div',undefined,'actions'),s=status(i),g=FoodGuide.guidance(i.name,i.storage);i.icon=g.icon;
