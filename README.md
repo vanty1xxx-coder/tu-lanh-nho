@@ -10,7 +10,7 @@
 - Danh sách sắp đến hạn (trong 3 ngày), quá hạn, đã dùng; tìm kiếm, xóa, hoàn tác đã dùng.
 - Đổi tên tủ lạnh bằng nút góc phải.
 - Sao lưu/khôi phục JSON, xuất lịch nhắc ICS.
-- Firebase Authentication với Google; cần tên miền nằm trong Authorized domains.
+- Bắt buộc đăng nhập Google qua Firebase Authentication trước khi sử dụng. Không có chế độ khách; lỗi kết nối giữ nguyên màn hình đăng nhập. Tên miền cần nằm trong Authorized domains.
 
 ## Chạy và triển khai
 
@@ -29,3 +29,5 @@ Firebase project: `tu-lanh-nho`. Cấu hình web trong `firebase-config.json` l�
 
 Tham khảo bảo quản: https://www.foodsafety.gov/food-safety-charts/cold-food-storage-charts
 
+
+Đăng nhập bắt buộc được thực thi trên giao diện website tĩnh. Mã nguồn công khai; dữ liệu vẫn lưu trên thiết bị theo UID, chưa có cơ sở dữ liệu máy chủ.
