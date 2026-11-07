@@ -50,8 +50,8 @@
     else if(has(n,'hai san'))r=record('seafood','Hải sản chưa rõ loại','🐟','us',null,null,'Ghi rõ loại hải sản hoặc ngày trên bao bì.');
     else r=record('unknown','Chưa nhận diện chắc chắn','📦',null,null,null,'Cần tên cụ thể hoặc ngày trên bao bì.');
     if(r.id==='unknown'){
-      const extra=[['xoai','🥭'],['du du','🍈'],['kiwi','🥝'],['dua hau','🍉'],['dua luoi','🍈'],['dua gang','🍈'],['dua','🥥'],['vai','🍎'],['nhan','🍎'],['chom chom','🍎'],['thanh long','🍎'],['oi','🍎'],['sau rieng','🍎'],['khoai tay','🥔'],['khoai lang','🍠'],['hanh','🧅'],['toi','🧄'],['nam','🍄']].find(([word])=>has(n,word));
-      if(extra)r=record('produce-other','Rau quả chưa có mốc phù hợp',extra[1],'umd',null,null,'Cần hướng dẫn đúng loại và trạng thái; không tự gán ngày.');
+      const extra=[['banh bao','🥟'],['ha cao','🥟'],['com','🍚'],['banh mi','🍞'],['banh ngot','🍰'],['kem','🍦'],['cua','🦀'],['vit','🦆'],['xoai','🥭'],['du du','🍈'],['kiwi','🥝'],['dua hau','🍉'],['dua luoi','🍈'],['dua gang','🍈'],['dua','🥥'],['vai','🍎'],['nhan','🍎'],['chom chom','🍎'],['thanh long','🍎'],['oi','🍎'],['sau rieng','🍎'],['khoai tay','🥔'],['khoai lang','🍠'],['hanh','🧅'],['toi','🧄'],['nam','🍄']].find(([word])=>has(n,word));
+      if(extra){const prepared=any(n,['banh bao','ha cao','com','banh mi','banh ngot','kem','cua','vit']);r=record(prepared?'food-other':'produce-other',prepared?'Món chưa có hướng dẫn riêng':'Rau quả chưa có hướng dẫn riêng',extra[1],prepared?null:'umd',null,null,'Mốc dựa trên loại và trạng thái; khi thiếu tài liệu chỉ dùng lịch kiểm tra mặc định.');}
     }
     if(r.id==='citrus'&&has(n,'chanh'))r.icon='🍋';
     if(r.id==='brassica'&&has(n,'bap cai'))r.icon='🥬';
@@ -66,9 +66,14 @@
   }
   const validDate=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&Number.isFinite(Date.parse(d+'T12:00:00Z'))&&new Date(d+'T12:00:00Z').toISOString().slice(0,10)===d;
   function add(date,count,unit){if(!validDate(date))return null;const d=new Date(date+'T12:00:00Z');if(unit==='month'){const day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+count);const last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));}else d.setUTCDate(d.getUTCDate()+count*(unit==='week'?7:1));return d.toISOString().slice(0,10);}
-  function guidance(name,storage='fridge'){const r=identify(name),period=r[storage==='freezer'?'freezer':'fridge'];return {...r,period:period||null,storage:storage==='freezer'?'freezer':'fridge',sourceInfo:r.source?sources[r.source]:null,quality:storage==='freezer'||['umd','aces'].includes(r.source)};}
+  function guidance(name,storage='fridge'){
+    const r=identify(name),place=storage==='freezer'?'freezer':'fridge',published=r[place];
+    const fallback=!published,checkNow=fallback&&place==='freezer'&&['egg-shell','egg-cooked'].includes(r.id);
+    const period=published||(checkNow?range(0,0):place==='freezer'?range(1,1,'month'):range(3,3));
+    return {...r,period,fallback,checkNow,storage:place,sourceInfo:!fallback&&r.source?sources[r.source]:null,backgroundSource:fallback&&r.source?sources[r.source]:null,quality:!fallback&&(place==='freezer'||['umd','aces'].includes(r.source))};
+  }
   function periodText(p){if(!p)return '';const u={day:'ngày',week:'tuần',month:'tháng'}[p.unit];return (p.min===p.max?p.min:p.min+'–'+p.max)+' '+u;}
   function average(p){return Math.round((p.min+p.max)/2)}
   function averageText(p){return average(p)+' '+{day:'ngày',week:'tuần',month:'tháng'}[p.unit]}
-  const api={version:2,sources,normalize,identify,guidance,validDate,add,periodText,average,averageText};root.FoodGuide=api;if(typeof module!=='undefined')module.exports=api;
+  const api={version:4,sources,normalize,identify,guidance,validDate,add,periodText,average,averageText};root.FoodGuide=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

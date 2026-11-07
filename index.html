@@ -3,18 +3,18 @@
 <html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b44">
 <title>Tủ lạnh nhỏ</title>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="colorful.css"><link rel="stylesheet" href="auth.css"><link rel="stylesheet" href="rename.css"><link rel="stylesheet" href="food-guide.css?v=3">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="colorful.css"><link rel="stylesheet" href="auth.css"><link rel="stylesheet" href="rename.css"><link rel="stylesheet" href="food-guide.css?v=4">
 </head><body><main>
 <header><span>Tủ lạnh của bạn</span><button id="export">Sao lưu</button></header>
 <section class="hero"><small>BỚT QUÊN MÓN · BỚT LÃNG PHÍ</small><h1>Hôm nay bạn mua gì?</h1><p>Ghi tên món vừa mua. Để tủ lạnh nhỏ giúp bạn nhớ.</p></section>
 <form id="add"><label for="name">THÊM VÀO TỦ LẠNH</label><div class="row composer-name"><input id="name" required maxlength="100" placeholder="Bạn vừa mua gì?" autocomplete="off"><button type="submit" aria-label="Thêm thực phẩm">＋</button></div>
 <div class="composer-options"><label for="quantity">Số lượng <input id="quantity" type="number" min="0.01" max="9999" step="any" value="1" required inputmode="decimal"></label><label for="storage">Bảo quản <select id="storage"><option value="fridge">Ngăn mát</option><option value="freezer">❄ Ngăn đông</option></select></label></div>
 <p id="hint">Ngăn mát ≤ 4°C · Tính từ hôm nay.</p></form>
-<aside><strong>Mốc tham khảo có nguồn, không phải hạn chính xác của từng món.</strong> Ưu tiên ngày và hướng dẫn trên bao bì. App không biết tình trạng thực tế hoặc lịch sử nhiệt độ. Chọn đúng ngăn và xem điều kiện trên thẻ món.</aside>
+<aside><strong>Mốc tham khảo có nguồn, không phải hạn chính xác của từng món.</strong> Ưu tiên ngày và hướng dẫn trên bao bì. Món chưa có hướng dẫn riêng dùng lịch kiểm tra mặc định 3 ngày ngăn mát / 1 tháng ngăn đông; đây không phải hạn dùng đã được nghiên cứu.</aside>
 <section id="stats"></section><div class="toolbar"><h2>Trong tủ của bạn</h2><input id="search" placeholder="Tìm món…" aria-label="Tìm thực phẩm"></div>
 <nav id="filters"><button data-filter="all" class="selected">Tất cả</button><button data-filter="soon">Sắp đến mốc</button><button data-filter="expired">Quá mốc / hạn</button><button data-filter="unknown">Chưa có mốc</button><button data-filter="used">Đã dùng</button></nav>
 <section id="list"></section>
-<section class="note"><h3>Một lời nhắc, bớt một món bị quên</h3><p>Cảnh báo cập nhật khi mở app. Có thể nhập lịch nhắc vào điện thoại; chưa có dịch vụ push khi app đóng. Mốc tự động cũ từ bản có lỗi được bỏ để bạn xác nhận lại trong Sửa; hạn tự nhập được giữ.</p><button id="calendar">↓ Tải lịch nhắc hạn</button></section>
+<section class="note"><h3>Một lời nhắc, bớt một món bị quên</h3><p>Cảnh báo cập nhật khi mở app. Có thể nhập lịch nhắc vào điện thoại; chưa có dịch vụ push khi app đóng. Mọi món đều có mốc tự động. Hạn bạn tự nhập được giữ; các mốc tự động cũ được tính lại theo quy tắc hiện tại.</p><button id="calendar">↓ Tải lịch nhắc hạn</button></section>
 <footer>Dữ liệu chỉ lưu trên trình duyệt này; chưa đồng bộ thiết bị.<br><a href="sources.html" target="_blank" rel="noopener">Tài liệu, điều kiện bảo quản và cách tính mốc</a></footer>
 </main>
 <dialog id="editor"><form id="edit"><h2>Chỉnh sửa món</h2>
@@ -27,5 +27,5 @@
 <p>Ngày bắt đầu mặc định là ngày mua. Sửa lại nếu ngày nấu hoặc cấp đông khác. Hàng mua đông lạnh ưu tiên hạn trên bao bì; không kéo dài hạn khi chuyển ngăn.</p>
 <div class="row"><button type="button" id="cancel">Hủy</button><button>Lưu thay đổi</button></div></form></dialog>
 <div id="toast" role="status"></div>
-<script src="food-guide.js?v=3"></script><script src="app.js?v=3"></script><script src="layout.js?v=3"></script><script src="polish.js?v=3"></script><script src="rename.js"></script><script type="module" src="auth.js?v=3"></script>
+<script src="food-guide.js?v=4"></script><script src="app.js?v=4"></script><script src="layout.js?v=4"></script><script src="polish.js?v=4"></script><script src="rename.js"></script><script type="module" src="auth.js?v=4"></script>
 </body></html>

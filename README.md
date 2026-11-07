@@ -21,7 +21,7 @@ Firebase project: `tu-lanh-nho`. Cấu hình web trong `firebase-config.json` l�
 ## Giới hạn hiện tại
 
 - Mốc tham khảo dựa trên FoodSafety.gov, University of Maryland Extension và Alabama Extension; xem `sources.html`. Đây không phải hạn chính xác của từng món. Ngăn đông nói về chất lượng khi giữ liên tục ≤ −18°C; ngăn mát giả định ≤ 4°C. Ngày trên bao bì và hướng dẫn đúng sản phẩm được ưu tiên.
-- Tên quá chung hoặc thiếu hướng dẫn sẽ lưu chưa có mốc, không tự gán một ngày. Mốc tự động cũ có lỗi bị bỏ để người dùng xác nhận lại trong Sửa; hạn tự nhập được giữ. Chưa có AI.
+- Mọi món có mốc tự động: trung bình làm tròn khi có tài liệu, hoặc lịch kiểm tra mặc định 3 ngày ngăn mát / 1 tháng ngăn đông khi thiếu dữ liệu. Mốc mặc định không phải hạn dùng an toàn. Trứng không phù hợp cấp đông được nhắc kiểm tra ngay. Các mốc tự động cũ được cập nhật, hạn tự nhập được giữ. Chưa có AI.
 - Dữ liệu lưu bằng localStorage trên từng trình duyệt, tách danh sách theo tài khoản Google. Chưa đồng bộ đám mây; không dùng trên thiết bị chia sẻ để lưu dữ liệu riêng tư.
 - Chưa có push notification khi app đóng. File ICS có thể nhập vào ứng dụng lịch; khả năng nhắc phụ thuộc ứng dụng lịch.
 - Google đã bật trên Firebase. Cần kiểm tra đăng nhập trọn luồng trên tên miền xuất bản.
