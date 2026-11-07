@@ -15,7 +15,9 @@
  function matches(item,ing){
   const name=n(item.name);if(/\b(kho|chien|nuong|luoc|hap|canh|chao|bun|cha|sot|xot|hop)\b/.test(name)&&!['bún tươi','cơm trắng'].includes(ing.label))return false;
   if(ing.label==='cá')return /^cá(?:\s|$)/i.test(String(item.name).trim())&&!/^cá (chua|tím|rốt)/i.test(item.name);
-  if(ing.label==='trứng gà'&&/\b(cut|vit|muoi)\b/.test(name))return false;
+  if(ing.label==='thịt gà'&&/\b(trung|chan|long|gan|me)\b/.test(name))return false;
+  if(ing.label==='gạo tẻ'&&/\b(nep|lut)\b/.test(name))return false;
+  if(ing.label==='trứng gà'&&/\b(cut|vit|muoi|ca)\b/.test(name))return false;
   return ing.aliases.some(a=>(' '+name+' ').includes(' '+n(a)+' '));
  }
  const positive=i=>{const m=String(i.quantity||'').match(/^\s*(\d+(?:[.,]\d+)?)/);return !i.used&&m&&Number(m[1].replace(',','.'))>0};
