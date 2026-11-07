@@ -3,7 +3,8 @@
   const sources={
     us:{name:'FoodSafety.gov · Cold Food Storage Chart',url:'https://www.foodsafety.gov/food-safety-charts/cold-food-storage-charts'},
     umd:{name:'University of Maryland Extension · Rau củ, trái cây',url:'https://www.extension.umd.edu/resource/storing-garden-fruits-and-vegetables'},
-    aces:{name:'Alabama Extension · Food Storage Charts',url:'https://www.aces.edu/blog/topics/disaster-home-family/food-storage-charts/'}
+    aces:{name:'Alabama Extension · Food Storage Charts',url:'https://www.aces.edu/blog/topics/disaster-home-family/food-storage-charts/'},
+    clemson:{name:'Clemson Extension · Safe Handling of Fish',url:'https://hgic.clemson.edu/factsheet/safe-handling-of-fish/'}
   };
   const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   const has=(n,phrase)=>(' '+n+' ').includes(' '+phrase+' ');
@@ -45,7 +46,8 @@
     else if(any(n,['muc','squid']))r=record('squid','Mực tươi sống','🦑','us',range(1,3),range(6,18,'month'),'Mực sống, bảo quản liên tục.');
     else if(any(n,['ga','chicken']))r=record('chicken','Gà sống','🍗','us',range(1,2),has(n,'nguyen con')?range(12,12,'month'):range(9,9,'month'),'Giả định gà sống cắt miếng; gà nguyên con ghi rõ trong tên.');
     else if(any(n,['thit bo','thit heo','thit lon','thit cuu','suon','beef','pork'])||has(original,'bò'))r=record('meat','Thịt đỏ sống nguyên miếng','🥩','us',range(3,5),range(4,12,'month'),'Giả định miếng thịt sống, không xay; mốc đông tùy phần cắt.');
-    else if(any(n,['ca','fish','hai san']))r=record('fish-generic','Cá / hải sản chưa rõ loại','🐟','us',null,null,'Loại cá/hải sản có mốc khác nhau.','Ghi rõ cá hồi, cá tuyết, tôm hoặc mực.');
+    else if(any(n,['ca','fish']))r=record('fish-generic','Cá tươi sống','🐟','clemson',range(1,2),range(2,3,'month'),'Mốc chung cho cá tươi sống, giữ lạnh liên tục; loại cá cụ thể có thể khác.');
+    else if(has(n,'hai san'))r=record('seafood','Hải sản chưa rõ loại','🐟','us',null,null,'Ghi rõ loại hải sản hoặc ngày trên bao bì.');
     else r=record('unknown','Chưa nhận diện chắc chắn','📦',null,null,null,'Cần tên cụ thể hoặc ngày trên bao bì.');
     if(r.id==='unknown'){
       const extra=[['xoai','🥭'],['du du','🍈'],['kiwi','🥝'],['dua hau','🍉'],['dua luoi','🍈'],['dua gang','🍈'],['dua','🥥'],['vai','🍎'],['nhan','🍎'],['chom chom','🍎'],['thanh long','🍎'],['oi','🍎'],['sau rieng','🍎'],['khoai tay','🥔'],['khoai lang','🍠'],['hanh','🧅'],['toi','🧄'],['nam','🍄']].find(([word])=>has(n,word));
@@ -58,6 +60,7 @@
     const cooked=any(n,['da nau','da chin','nau chin','luoc','chien','nuong','hap','xao','rang','kho']);
     if(processed){r={...r,fridge:null,freezer:null,condition:'Sản phẩm đã chế biến/đóng gói: ưu tiên nhãn riêng.',why:'Không áp dụng thời gian của nguyên liệu tươi.'};}
     else if(cooked&&['chicken','meat','ground'].includes(r.id))r=record('cooked-meat','Thịt / gà đã nấu','🍲','us',range(3,4),range(2,6,'month'),'Tính từ ngày nấu; làm lạnh kịp thời.');
+    else if(cooked&&['fish-generic','fatty-fish','cod'].includes(r.id))r=record('cooked-fish','Cá đã nấu','🐟','clemson',range(3,4),range(1,1,'month'),'Tính từ ngày nấu; làm lạnh kịp thời.');
     if(any(n,['da cat','cat san'])&&!['melon','meat','chicken','ground','cooked-meat','soup'].includes(r.id))r={...r,fridge:null,freezer:null,condition:'Đã cắt/sơ chế: không dùng mốc dành cho nguyên quả.',why:'Cần hướng dẫn cụ thể cho thực phẩm đã cắt.'};
     return r;
   }
@@ -65,5 +68,7 @@
   function add(date,count,unit){if(!validDate(date))return null;const d=new Date(date+'T12:00:00Z');if(unit==='month'){const day=d.getUTCDate();d.setUTCDate(1);d.setUTCMonth(d.getUTCMonth()+count);const last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate();d.setUTCDate(Math.min(day,last));}else d.setUTCDate(d.getUTCDate()+count*(unit==='week'?7:1));return d.toISOString().slice(0,10);}
   function guidance(name,storage='fridge'){const r=identify(name),period=r[storage==='freezer'?'freezer':'fridge'];return {...r,period:period||null,storage:storage==='freezer'?'freezer':'fridge',sourceInfo:r.source?sources[r.source]:null,quality:storage==='freezer'||['umd','aces'].includes(r.source)};}
   function periodText(p){if(!p)return '';const u={day:'ngày',week:'tuần',month:'tháng'}[p.unit];return (p.min===p.max?p.min:p.min+'–'+p.max)+' '+u;}
-  const api={version:2,sources,normalize,identify,guidance,validDate,add,periodText};root.FoodGuide=api;if(typeof module!=='undefined')module.exports=api;
+  function average(p){return Math.round((p.min+p.max)/2)}
+  function averageText(p){return average(p)+' '+{day:'ngày',week:'tuần',month:'tháng'}[p.unit]}
+  const api={version:2,sources,normalize,identify,guidance,validDate,add,periodText,average,averageText};root.FoodGuide=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
