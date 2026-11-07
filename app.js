@@ -38,7 +38,7 @@ function sourceDetails(i){
 }
 function render(){
   const active=items.filter(i=>!i.used);
-  $('#stats').replaceChildren(...[[active.length,'món trong tủ'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3).length,'sắp đến mốc / hạn'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)<0).length,'quá mốc / hạn']].map(([n,t])=>{const e=el('div',undefined,'stat');e.append(el('strong',n),el('span',t));return e}));
+  $('#stats').replaceChildren(...[[active.length,'món trong tủ','all'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3).length,'sắp đến mốc / hạn','soon'],[active.filter(i=>days(i.expiry)!==null&&days(i.expiry)<0).length,'quá mốc / hạn','expired']].map(([n,t,key])=>{const e=el('button',undefined,'stat');e.type='button';e.dataset.statList=key;e.setAttribute('aria-haspopup','dialog');e.setAttribute('aria-controls','stats-popup');e.setAttribute('aria-label',`${n} ${t}. Mở danh sách`);e.append(el('strong',n),el('span',t),el('span','Xem danh sách →','stat-open'));return e}));
   const visible=items.filter(i=>(filter==='used'?i.used:!i.used)&&(filter!=='soon'||days(i.expiry)!==null&&days(i.expiry)>=0&&days(i.expiry)<=3)&&(filter!=='expired'||days(i.expiry)!==null&&days(i.expiry)<0)&&(filter!=='unknown'||!i.expiry)&&norm(i.name).includes(norm($('#search').value))).reverse();
   $('#list').replaceChildren();if(!visible.length)$('#list').append(el('div',filter==='all'&&!items.length?'Tủ đang trống. Thêm món đầu tiên của bạn nhé!':'Không có món nào trong danh sách này.','empty'));
   for(const i of visible){
