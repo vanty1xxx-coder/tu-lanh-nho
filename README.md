@@ -31,3 +31,14 @@ Tham khảo bảo quản: https://www.foodsafety.gov/food-safety-charts/cold-foo
 
 
 Đăng nhập bắt buộc được thực thi trên giao diện website tĩnh. Mã nguồn công khai; dữ liệu vẫn lưu trên thiết bị theo UID, chưa có cơ sở dữ liệu máy chủ.
+
+## Trừ thực phẩm khi nấu
+
+Nhập `đã nấu 1 cá, 1 cà chua` hoặc `-1 cá, -1 cà chua` tại ô chat. App kiểm tra toàn bộ lệnh trước khi trừ. Món còn dư giảm số lượng; món về 0 chuyển sang Đã dùng. Có nút hoàn tác lần trừ. Nếu nhiều lô cùng món, ưu tiên lô đến mốc trước; tên viết ngắn chỉ được nhận khi khớp một món duy nhất. Không gộp hay tự đổi giữa các đơn vị khác nhau.
+# Nhắc hạn và gợi ý món Việt
+
+- Món còn đúng 1 ngày, chưa dùng và số lượng > 0 xuất hiện trong banner và mục **Nhắc trước 1 ngày**. Đăng nhập trước khi đọc dữ liệu.
+- Thông báo hệ thống là tùy chọn, chỉ hỏi quyền khi người dùng nhấn bật. Chống lặp theo món/ngày/tài khoản. Chỉ kiểm tra khi app mở; không có backend push khi app đóng. Có thể xuất lịch ICS rồi nhập vào lịch điện thoại.
+- **Gợi ý món Việt** ở thanh bên trái chọn tối đa 3 công thức có nguồn trực tiếp từ Món Ngon Mỗi Ngày (Ajinomoto Việt Nam), đối chiếu nguyên liệu còn lại, ưu tiên mốc gần và đa dạng cơm/bún/cháo. Mỗi món có link nguồn, lượng thực tế trong tủ và nguyên liệu còn thiếu. Thư viện được chọn thủ công, không tự bịa công thức hay khẩu phần.
+- Không dùng thực phẩm đã dùng, số lượng 0 hoặc quá mốc/hạn để gợi ý. Xem công thức gốc để đối chiếu loại nguyên liệu và định lượng. Xem gợi ý không tự trừ thực phẩm; nhập lệnh đã nấu để ghi lượng thực tế.
+

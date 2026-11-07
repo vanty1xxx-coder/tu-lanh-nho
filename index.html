@@ -3,7 +3,7 @@
 <html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#145b44">
 <title>Tủ lạnh nhỏ</title>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="colorful.css"><link rel="stylesheet" href="auth.css"><link rel="stylesheet" href="auth-gate.css"><link rel="stylesheet" href="rename.css"><link rel="stylesheet" href="food-guide.css?v=4"><link rel="stylesheet" href="stats-popup.css">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="colorful.css"><link rel="stylesheet" href="auth.css"><link rel="stylesheet" href="auth-gate.css"><link rel="stylesheet" href="rename.css"><link rel="stylesheet" href="food-guide.css?v=4"><link rel="stylesheet" href="stats-popup.css"><link rel="stylesheet" href="stock-commands.css">
 </head><body class="auth-locked">
 <section id="auth-gate" aria-labelledby="auth-title"><div class="auth-card">
 <div class="auth-brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6z M6 10h12 M9 6v2 M9 13v3"/></svg>Tủ lạnh nhỏ</div>
@@ -14,9 +14,9 @@
 </div></section><main inert>
 <header><span>Tủ lạnh của bạn</span><button id="export">Sao lưu</button></header>
 <section class="hero"><small>BỚT QUÊN MÓN · BỚT LÃNG PHÍ</small><h1>Hôm nay bạn mua gì?</h1><p>Ghi tên món vừa mua. Để tủ lạnh nhỏ giúp bạn nhớ.</p></section>
-<form id="add"><label for="name">THÊM VÀO TỦ LẠNH</label><div class="row composer-name"><input id="name" required maxlength="100" placeholder="Bạn vừa mua gì?" autocomplete="off"><button type="submit" aria-label="Thêm thực phẩm">＋</button></div>
+<form id="add"><label for="name">THÊM VÀO TỦ LẠNH</label><div class="row composer-name"><input id="name" required maxlength="500" placeholder="Bạn vừa mua gì?" autocomplete="off"><button type="submit" aria-label="Thêm thực phẩm">＋</button></div>
 <div class="composer-options"><label for="quantity">Số lượng <input id="quantity" type="number" min="0.01" max="9999" step="any" value="1" required inputmode="decimal"></label><label for="storage">Bảo quản <select id="storage"><option value="fridge">Ngăn mát</option><option value="freezer">❄ Ngăn đông</option></select></label></div>
-<p id="hint">Ngăn mát ≤ 4°C · Tính từ hôm nay.</p></form>
+<p class="command-example">Đã nấu? Gõ “đã nấu 1 cá, 1 cà chua” hoặc “-1 cá”.</p><p id="hint">Ngăn mát ≤ 4°C · Tính từ hôm nay.</p></form>
 <aside><strong>Mốc tham khảo có nguồn, không phải hạn chính xác của từng món.</strong> Ưu tiên ngày và hướng dẫn trên bao bì. Món chưa có hướng dẫn riêng dùng lịch kiểm tra mặc định 3 ngày ngăn mát / 1 tháng ngăn đông; đây không phải hạn dùng đã được nghiên cứu.</aside>
 <section id="stats"></section><div class="toolbar"><h2>Trong tủ của bạn</h2><input id="search" placeholder="Tìm món…" aria-label="Tìm thực phẩm"></div>
 <nav id="filters"><button data-filter="all" class="selected">Tất cả</button><button data-filter="soon">Sắp đến mốc</button><button data-filter="expired">Quá mốc / hạn</button><button data-filter="unknown">Chưa có mốc</button><button data-filter="used">Đã dùng</button></nav>
@@ -34,5 +34,6 @@
 <p>Ngày bắt đầu mặc định là ngày mua. Sửa lại nếu ngày nấu hoặc cấp đông khác. Hàng mua đông lạnh ưu tiên hạn trên bao bì; không kéo dài hạn khi chuyển ngăn.</p>
 <div class="row"><button type="button" id="cancel">Hủy</button><button>Lưu thay đổi</button></div></form></dialog>
 <div id="toast" role="status"></div>
-<script src="food-guide.js?v=4"></script><script src="app.js?v=6"></script><script src="layout.js?v=4"></script><script src="polish.js?v=4"></script><script src="stats-popup.js"></script><script src="rename.js"></script><script type="module" src="auth.js?v=7"></script>
+<link rel="stylesheet" href="meal-reminders.css">
+<script src="food-guide.js?v=4"></script><script src="stock-commands.js"></script><script src="app.js?v=8"></script><script src="layout.js?v=4"></script><script src="polish.js?v=8"></script><script src="stats-popup.js"></script><script src="rename.js"></script><script src="meal-guide.js"></script><script src="meal-reminders.js"></script><script type="module" src="auth.js?v=7"></script>
 </body></html>

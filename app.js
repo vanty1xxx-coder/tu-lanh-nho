@@ -1,6 +1,6 @@
 
 let KEY='tu-lanh-nho-v1';
-let items=[],filter='all',editing=null;
+let items=[],filter='all',editing=null,lastUseUndo=null;
 const $=s=>document.querySelector(s),norm=FoodGuide.normalize;
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const addDays=(date,n)=>FoodGuide.add(date,n,'day');
@@ -15,6 +15,7 @@ function hydrateRecords(data){
     if(!i||typeof i.id!=='string'||typeof i.name!=='string'||typeof i.quantity!=='string'||!FoodGuide.validDate(i.purchase)||(i.expiry!=null&&i.expiry!==''&&!FoodGuide.validDate(i.expiry)))throw Error('invalid record');
     const legacy=!!i.estimated&&i.guideVersion!==FoodGuide.version;
     const item={id:i.id,name:i.name.slice(0,100),quantity:i.quantity.slice(0,40),purchase:i.purchase,storage:i.storage==='freezer'?'freezer':'fridge',start:FoodGuide.validDate(i.start)?i.start:i.purchase,expiry:legacy?null:i.expiry||null,estimated:legacy||!!i.estimated,used:!!i.used,guideVersion:FoodGuide.version,needsReview:legacy||!!i.needsReview,oldExpiry:legacy?i.expiry:i.oldExpiry||null,icon:FoodGuide.identify(i.name).icon,estimateMethod:i.estimateMethod||'early'};
+    if(typeof i.quantityBeforeUse==='string')item.quantityBeforeUse=i.quantityBeforeUse.slice(0,40);
     const guide=FoodGuide.guidance(item.name,item.storage);
     if(i.estimated||!item.expiry){item.expiry=FoodGuide.add(item.start,FoodGuide.average(guide.period),guide.period.unit);item.estimated=true;item.estimateMethod=guide.fallback?'default':'average';item.needsReview=false;}
     return item;
@@ -23,6 +24,23 @@ function hydrateRecords(data){
 function loadRecords(){try{items=hydrateRecords(JSON.parse(localStorage.getItem(KEY)||'[]'));save();}catch{items=[];toast('Dữ liệu lưu chưa hợp lệ. Hãy kiểm tra bản sao lưu.')}}
 loadRecords();
 function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
+function toggleUsed(item){
+  if(item.used){if(StockCommands.quantity(item.quantity)?.value===0&&StockCommands.quantity(item.quantityBeforeUse)?.value>0)item.quantity=item.quantityBeforeUse;item.used=false;delete item.quantityBeforeUse;}
+  else item.used=true;
+  save();render();
+}
+function useFromChat(text){
+  const planned=StockCommands.plan(text,items);if(!planned)return false;
+  const bubble=el('div',undefined,'bubble stock-result');
+  if(planned.error){bubble.textContent=planned.error;$('#chatlog')?.replaceChildren(bubble);toast(planned.error);return true;}
+  const previous=items;items=planned.items;
+  if(!save()){items=previous;render();return true;}
+  lastUseUndo={key:KEY,changes:planned.changes};render();$('#name').value='';$('#quantity').value='1';updateComposerMode();
+  bubble.append(el('div',planned.results.map(r=>`Đã dùng ${r.amount} ${r.unit} ${r.name}. ${r.remaining>0?'Còn '+r.remaining+' '+r.unit+' trong tủ.':'Đã hết — chuyển sang Đã dùng.'}`).join('\n')));
+  const undo=el('button','Hoàn tác lần trừ này','stock-undo');undo.type='button';const transaction=lastUseUndo;
+  undo.onclick=()=>{if(lastUseUndo!==transaction||KEY!==transaction.key)return toast('Lần trừ này không còn khả dụng để hoàn tác.');const reverted=StockCommands.undo(transaction.changes,items);if(reverted.error)return toast(reverted.error);const current=items;items=reverted.items;if(!save()){items=current;return}lastUseUndo=null;render();undo.disabled=true;undo.textContent='Đã hoàn tác';toast('Đã khôi phục số lượng trước lần trừ.')};
+  bubble.append(undo);$('#chatlog')?.replaceChildren(bubble);toast('Đã cập nhật số lượng trong tủ.');return true;
+}
 function status(i){const d=days(i.expiry),g=FoodGuide.guidance(i.name,i.storage);if(i.used)return {text:'Đã dùng',kind:''};if(d===null)return {text:i.needsReview?'Cần xác nhận lại mốc cũ':'Chưa đủ dữ liệu để tính mốc',kind:'unknown'};if(!i.estimated)return {text:d<0?`Quá hạn đã nhập ${-d} ngày`:d===0?'Đến hạn đã nhập hôm nay':`Còn ${d} ngày · hạn đã nhập`,kind:d<0?'expired':d<=3?'soon':''};const title=g.fallback?'mốc kiểm tra':g.quality?'mốc chất lượng':'mốc ước tính';return {text:d<0?`Quá ${title} ${-d} ngày`:d===0?`Đến ${title} hôm nay`:`Còn ${d} ngày đến ${title}`,kind:d<0?'expired':d<=3?'soon':''}}
 function sourceDetails(i){
   const g=FoodGuide.guidance(i.name,i.storage),details=el('details',undefined,'guide-details');details.append(el('summary','Vì sao có mốc này?'));
@@ -48,7 +66,7 @@ function render(){
     if(i.expiry)body.append(el('p',`${i.estimated?(g.fallback?'Ngày nhắc kiểm tra':g.quality?'Mốc chất lượng tham khảo':'Ngày tham khảo'):'Hạn bạn nhập'}: ${fmt(i.expiry)}`));
     else body.append(el('p',g.why||'Ghi rõ loại thực phẩm hoặc bổ sung hạn trên bao bì.','missing-date'));
     body.append(sourceDetails(i));
-    for(const [t,fn]of [[i.used?'Hoàn tác':'✓ Đã dùng',()=>{i.used=!i.used;save();render()}],['Sửa',()=>openEdit(i)],['Xóa',()=>{if(confirm(`Xóa ${i.name}?`)){items=items.filter(x=>x.id!==i.id);save();render()}}]]){const b=el('button',t);b.onclick=fn;actions.append(b)}
+    for(const [t,fn]of [[i.used?'Hoàn tác':'✓ Đã dùng',()=>toggleUsed(i)],['Sửa',()=>openEdit(i)],['Xóa',()=>{if(confirm(`Xóa ${i.name}?`)){items=items.filter(x=>x.id!==i.id);save();render()}}]]){const b=el('button',t);b.onclick=fn;actions.append(b)}
     const picture=el('div',g.icon,'emoji');picture.setAttribute('role','img');picture.setAttribute('aria-label',g.label);a.append(picture,body,actions);$('#list').append(a);
   }
 }
@@ -75,7 +93,9 @@ $('#edit').onsubmit=e=>{
 };
 $('#add').onsubmit=e=>{
   e.preventDefault();const name=$('#name').value.trim(),quantity=Number($('#quantity').value),storage=$('#storage').value;
-  if(!name||!Number.isFinite(quantity)||quantity<=0||quantity>9999)return;
+  if(!name)return;if(useFromChat(name))return;
+  if(name.length>100){toast('Tên món tối đa 100 ký tự.');return}
+  if(!Number.isFinite(quantity)||quantity<=0||quantity>9999)return;
   const g=FoodGuide.guidance(name,storage),start=today(),expiry=g.period?FoodGuide.add(start,FoodGuide.average(g.period),g.period.unit):null;
   const i={id:crypto.randomUUID(),name,quantity:String(quantity)+' phần',purchase:start,start,storage,expiry,estimated:!!expiry,used:false,icon:g.icon,guideVersion:FoodGuide.version,needsReview:false,estimateMethod:g.fallback?'default':'average'};
   items.push(i);save();render();$('#name').value='';$('#quantity').value='1';
@@ -83,6 +103,8 @@ $('#add').onsubmit=e=>{
   const b=el('div',message,'bubble');$('#chatlog')?.replaceChildren(b);toast(expiry?'Đã thêm món với mốc tham khảo.':'Đã thêm món, chưa gán hạn dùng.');
 };
 function updateComposerHint(){const storage=$('#storage').value;$('#hint').textContent=storage==='freezer'?'≤ −18°C · Giả định cấp đông hôm nay; hàng mua đông lạnh ưu tiên HSD bao bì.':'≤ 4°C · Tính từ hôm nay; nguyên liệu tươi sống trừ khi tên ghi rõ đã nấu.'}
+function updateComposerMode(){const cooking=StockCommands.parse($('#name').value)!==null;$('#quantity').disabled=cooking;$('#storage').disabled=cooking;$('#name').setAttribute('aria-label',cooking?'Ghi món đã nấu':'Tên món hoặc lệnh đã nấu');}
+$('#name').addEventListener('input',updateComposerMode);updateComposerMode();
 $('#storage').onchange=updateComposerHint;updateComposerHint();
 $('#search').oninput=render;
 $('#filters').onclick=e=>{if(!e.target.dataset.filter)return;filter=e.target.dataset.filter;document.querySelectorAll('#filters button').forEach(b=>b.classList.toggle('selected',b===e.target));render()};
@@ -94,4 +116,5 @@ $('#calendar').onclick=()=>{
   for(const i of active){const date=addDays(i.expiry,-1).replaceAll('-','');lines.push('BEGIN:VEVENT',`UID:${i.id}@tu-lanh-nho`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')}`,`DTSTART;VALUE=DATE:${date}`,`SUMMARY:${esc('Kiểm tra: '+i.name)}`,`DESCRIPTION:${esc((i.estimated?'Mốc tham khảo':'Hạn đã nhập')+': '+fmt(i.expiry)+'. '+storeName(i.storage)+'. Không xác nhận tình trạng thực tế.')}`,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Kiểm tra thực phẩm','TRIGGER:PT9H','END:VALARM','END:VEVENT')}
   lines.push('END:VCALENDAR');download(lines.join('\r\n')+'\r\n','text/calendar;charset=utf-8','nhac-han-tu-lanh.ics');
 };
+window.addEventListener('fridge-account-changed',()=>{lastUseUndo=null});
 setInterval(render,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});render();
