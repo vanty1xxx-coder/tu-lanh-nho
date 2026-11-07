@@ -23,6 +23,6 @@ Firebase project: `tu-lanh-nho`. Cấu hình web trong `firebase-config.json` l�
 - Dữ liệu lưu bằng localStorage trên từng trình duyệt, tách danh sách theo tài khoản Google. Chưa đồng bộ đám mây; không dùng trên thiết bị chia sẻ để lưu dữ liệu riêng tư.
 - Chưa có push notification khi app đóng. File ICS có thể nhập vào ứng dụng lịch; khả năng nhắc phụ thuộc ứng dụng lịch.
 - Google đã bật trên Firebase. Cần kiểm tra đăng nhập trọn luồng trên tên miền xuất bản.
-- Website chưa được xác nhận triển khai công khai.
+- Website đã xuất bản tại https://vanty1xxx-coder.github.io/tu-lanh-nho/ . Đăng nhập Google cần kiểm tra trọn luồng trên thiết bị người dùng.
 
 Tham khảo bảo quản: https://www.foodsafety.gov/food-safety-charts/cold-food-storage-charts
